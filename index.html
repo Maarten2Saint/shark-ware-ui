@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Eclipse Menu (DUI-ready)</title>
+  <style>
+/* DUI/Overlay Basics: feste Canvas! */
+html, body{
+  margin:0; padding:0;
+  background:transparent;
+  overflow:hidden;
+  width:800px;   /* == WIDTH in Lua */
+  height:600px;  /* == HEIGHT in Lua */
+}
+.overlay{
+  position:absolute; top:0; left:0;
+  pointer-events:none; /* blockiert Game nicht */
+}
+
+/* Menü */
+.menu { width:360px; background:rgba(0,0,0,.18); color:#fff;
+  display:flex; flex-direction:column; border:2px solid #666; box-shadow:none; }
+.menu-header{ padding:0; }
+.menu-header img{ width:100%; height:auto; display:block; }
+.menu-title{ background:rgba(0,0,0,.85); padding:8px 20px; font-weight:700; letter-spacing:.3px; color:#d0d0d0; }
+.menu-section{ background:rgba(0,0,0,.35); flex-grow:1; }
+.menu-item{ padding:10px 20px; display:flex; justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.08); cursor:default; background:transparent;
+  transition:background .15s; color:#dcdcdc; }
+.menu-item.active{ background:#000; color:#fff; }
+.menu-item:hover:not(.active){ background:rgba(128,128,128,.2); }
+.submenu{ display:none; flex-direction:column; background:rgba(0,0,0,.45); }
+.submenu-item{ padding:8px 30px; border-bottom:1px solid rgba(255,255,255,.08); color:#bfbfbf; }
+.submenu-item.active{ background:rgba(128,128,128,.75); color:#fff; }
+.submenu-item:hover:not(.active){ background:rgba(128,128,128,.2); color:#fff; }
+.menu-footer{ background:rgba(0,0,0,.85); color:#b0b0b0; font-size:11px; padding:6px 10px; display:flex; justify-content:space-between; }
+
+/* Debug-Overlay */
+#dbg{ position:fixed; left:8px; top:8px; font:12px monospace; color:#0f0;
+  background:rgba(0,0,0,.35); padding:6px 8px; border:1px solid rgba(0,255,0,.25);
+  pointer-events:none; z-index:99999; }
+
+/* Keybind-Popup (unten mittig, gleicher Style) */
+.bind{
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  pointer-events:none; /* keine Klicks blocken */
+  z-index:9999;
+}
+.bind .menu{ width:380px; border-color:#666; }
+.bind .menu-title{ color:#d0d0d0; }
+.bind .menu-section{ padding:12px 20px; }
+.bind .hint{ opacity:.85; margin-bottom:6px; }
+.bind .label{ font-weight:700; font-size:18px; color:#fff; }
+.bind .sub{ opacity:.75; font-size:12px; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div id="dbg">[UI] booting…</div>
+
+  <div class="overlay">
+    <div class="menu">
+      <div class="menu-header">
+        <img src="https://cdn.discordapp.com/attachments/1366488328773439551/1403671888936435722/image.png" alt="Shark.Ware Banner">
+      </div>
+
+      <div class="menu-title" id="menuTitle">Main menu</div>
+
+      <div class="menu-section" id="mainMenu">
+        <div class="menu-item" data-title="Self">Self <span>></span></div>
+        <div class="menu-item" data-title="Server">Server <span>></span></div>
+        <div class="menu-item" data-title="Weapon">Weapon <span>></span></div>
+        <div class="menu-item" data-title="Combat">Combat <span>></span></div>
+        <div class="menu-item" data-title="Vehicle">Vehicle <span>></span></div>
+        <div class="menu-item" data-title="Visual">Visual <span>></span></div>
+        <div class="menu-item" data-title="Misc">Misc <span>></span></div>
+        <div class="menu-item" data-title="Settings">Settings <span>></span></div>
+        <div class="menu-item" data-title="Search">Search <span>></span></div>
+      </div>
+
+      <div class="menu-section submenu" id="submenu">
+        <div class="submenu-item">Kick Vehicle out of map <span>></span></div>
+        <div class="submenu-item">Placeholder 2 <span>></span></div>
+        <div class="submenu-item">Placeholder 3 <span>></span></div>
+        <div class="submenu-item">Placeholder 4 <span>></span></div>
+        <div class="submenu-item">Placeholder 5 <span>></span></div>
+      </div>
+
+      <div class="menu-footer">
+        <div>Build: 262119</div>
+        <div id="pageCounter">1 / 9</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keybind-Popup -->
+  <div class="bind" id="bindPicker" style="display:none;">
+    <div class="menu">
+      <div class="menu-title">Set keybind</div>
+      <div class="menu-section">
+        <div class="hint">Press any key…</div>
+        <div class="label" id="bindLabel">(none)</div>
+        <div class="sub">Enter to confirm · Backspace to cancel</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+/* ===== Debug / Fehler ===== */
+const dbg = document.getElementById('dbg');
+const log = (m)=>{ dbg.textContent = String(m); console.log(m); }
+window.addEventListener('error', e => log('[UI ERROR] ' + e.message + ' @' + e.lineno+':'+e.colno));
+log('[UI] ready');
+
+/* ===== DOM refs ===== */
+const items = [...document.querySelectorAll('.menu-item')];
+let submenuItems = [...document.querySelectorAll('.submenu-item')];
+const submenu = document.getElementById('submenu');
+const mainMenu = document.getElementById('mainMenu');
+const menuTitle = document.getElementById('menuTitle');
+const pageCounter = document.getElementById('pageCounter');
+
+const bindPicker = document.getElementById('bindPicker');
+const bindLabel  = document.getElementById('bindLabel');
+
+let index = 0, subIndex = 0;
+function updateSelection(){
+  items.forEach((el,i)=>el.classList.toggle('active', i===index));
+  pageCounter.textContent = `${index+1} / ${items.length}`;
+}
+function updateSubSelection(){
+  submenuItems.forEach((el,i)=>el.classList.toggle('active', i===subIndex));
+}
+updateSelection();
+
+/* ===== Keyboard (fallback) ===== */
+document.addEventListener('keydown', e=>{
+  const inSub = getComputedStyle(submenu).display !== 'none';
+  if (!inSub){
+    if (e.key==='ArrowDown'){ index=(index+1)%items.length; updateSelection(); }
+    else if (e.key==='ArrowUp'){ index=(index-1+items.length)%items.length; updateSelection(); }
+    else if (e.key==='Enter'){
+      const title = items[index].dataset.title || items[index].textContent.trim().split(' ')[0];
+      menuTitle.textContent = title;
+      mainMenu.style.display='none'; submenu.style.display='flex';
+      subIndex=0; updateSubSelection();
+    }
+  }else{
+    if (e.key==='Backspace'){ submenu.style.display='none'; mainMenu.style.display='block'; menuTitle.textContent='Main menu'; updateSelection(); }
+    else if (e.key==='ArrowDown'){ subIndex=(subIndex+1)%submenuItems.length; updateSubSelection(); }
+    else if (e.key==='ArrowUp'){ subIndex=(subIndex-1+submenuItems.length)%submenuItems.length; updateSubSelection(); }
+  }
+});
+
+/* ===== Lua → HTML Bridge (SendDuiMessage) ===== */
+window.addEventListener('message', (ev)=>{
+  const d = ev.data || {};
+  try{
+    switch(d.type){
+      case 'setTitle': {
+        menuTitle.textContent = d.text || 'Main menu';
+        log('setTitle: '+menuTitle.textContent);
+        break;
+      }
+      case 'selectIndex': {
+        const i = Math.max(0, Math.min(items.length-1, Number(d.index)||0));
+        index = i; updateSelection();
+        log('selectIndex: '+i);
+        break;
+      }
+      case 'openSubmenu': {
+        mainMenu.style.display='none'; submenu.style.display='flex';
+        subIndex = 0; updateSubSelection();
+        log('openSubmenu');
+        break;
+      }
+      case 'closeSubmenu': {
+        submenu.style.display='none'; mainMenu.style.display='block';
+        menuTitle.textContent = 'Main menu';
+        updateSelection();
+        log('closeSubmenu');
+        break;
+      }
+      case 'setSubmenu': {
+        if (Array.isArray(d.items)){
+          submenu.innerHTML = d.items
+            .map((t,i)=>`<div class="submenu-item${i===0?' active':''}">${t} <span>></span></div>`)
+            .join('');
+          submenuItems = [...document.querySelectorAll('.submenu-item')];
+          subIndex = 0;
+          log('setSubmenu: '+d.items.length+' items');
+        }
+        break;
+      }
+      case 'selectSub': {
+        const n = submenuItems.length;
+        if (n){
+          subIndex = Math.max(0, Math.min(n-1, Number(d.index)||0));
+          updateSubSelection();
+          log('selectSub: '+subIndex);
+        }
+        break;
+      }
+      /* === Keybind-Popup === */
+      case 'bind_show': {
+        bindPicker.style.display = 'block';
+        bindLabel.textContent = d.label || '(none)';
+        log('bind_show');
+        break;
+      }
+      case 'bind_label': {
+        bindLabel.textContent = d.label || '(none)';
+        break;
+      }
+      case 'bind_hide': {
+        bindPicker.style.display = 'none';
+        log('bind_hide');
+        break;
+      }
+    }
+  }catch(e){ log('[bridge err] '+e.message); }
+});
+  </script>
+</body>
+</html>

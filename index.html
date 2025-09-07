@@ -1,114 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shark.lua UI</title>
-  <style>
-html, body{
-  margin:0; padding:0; background:transparent; overflow:hidden; width:800px; height:600px;
-}
-.overlay{ position:absolute; top:0; left:0; pointer-events:none; }
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shark.lua UI</title>
+<style>
+html, body { margin:0; padding:0; background:transparent; overflow:hidden; width:800px; height:600px;}
+.overlay { position:absolute; top:0; left:0; pointer-events:none; }
 .menu { width:360px; background:rgba(0,0,0,.18); color:#fff; display:flex; flex-direction:column; border:2px solid #666; }
-.menu-header{ padding:0; }
-.menu-header img{ width:100%; height:auto; display:block; }
-.menu-title{ background:rgba(0,0,0,.85); padding:8px 20px; font-weight:700; color:#d0d0d0; }
+.menu-header img{ width:100%; display:block;}
+.menu-title{ background:rgba(0,0,0,.85); padding:8px 20px; font-weight:700; color:#d0d0d0;}
 .menu-section{ background:rgba(0,0,0,.35); flex-grow:1; }
 .menu-item{ padding:10px 20px; display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); cursor:default; color:#dcdcdc; }
-.menu-item.active{ background:#000; color:#fff; }
+.menu-item.active{ background:#000; color:#fff;}
 .menu-item:hover:not(.active){ background:rgba(128,128,128,.2); }
-.submenu{ display:none; flex-direction:column; background:rgba(0,0,0,.45); }
-.submenu-item{ padding:8px 30px; border-bottom:1px solid rgba(255,255,255,.08); color:#bfbfbf; display:flex; justify-content:space-between; }
-.submenu-item.active{ background:rgba(128,128,128,.75); color:#fff; }
-.submenu-item:hover:not(.active){ background:rgba(128,128,128,.2); color:#fff; }
-.menu-footer{ background:rgba(0,0,0,.85); color:#b0b0b0; font-size:11px; padding:6px 10px; display:flex; justify-content:space-between; }
-#dbg{ position:fixed; left:8px; top:8px; font:12px monospace; color:#0f0; background:rgba(0,0,0,.35); padding:6px 8px; border:1px solid rgba(0,255,0,.25); pointer-events:none; z-index:99999; }
-  </style>
+.submenu{ display:none; flex-direction:column; background:rgba(0,0,0,.45);}
+.submenu-item{ padding:8px 30px; border-bottom:1px solid rgba(255,255,255,.08); color:#bfbfbf;}
+.submenu-item.active{ background:rgba(128,128,128,.75); color:#fff;}
+.submenu-item:hover:not(.active){ background:rgba(128,128,128,.2); color:#fff;}
+.menu-footer{ background:rgba(0,0,0,.85); color:#b0b0b0; font-size:11px; padding:6px 10px; display:flex; justify-content:space-between;}
+#dbg{ position:fixed; left:8px; top:8px; font:12px monospace; color:#0f0; background:rgba(0,0,0,.35); padding:6px 8px; border:1px solid rgba(0,255,0,.25);}
+</style>
 </head>
 <body>
-  <div id="dbg">[UI] booting…</div>
+<div id="dbg">[UI] booting…</div>
 
-  <div class="overlay">
-    <div class="menu">
-      <div class="menu-header">
-        <img src="https://cdn.discordapp.com/attachments/1366488328773439551/1403671888936435722/image.png" alt="Shark.Ware Banner">
-      </div>
+<div class="overlay">
+  <div class="menu">
+    <div class="menu-header">
+      <img src="https://cdn.discordapp.com/attachments/1366488328773439551/1403671888936435722/image.png" alt="Shark.Ware Banner">
+    </div>
 
-      <div class="menu-title" id="menuTitle">Main menu</div>
+    <div class="menu-title" id="menuTitle">Main menu</div>
 
-      <div class="menu-section" id="mainMenu">
-        <div class="menu-item" data-title="Self">Self <span>></span></div>
-        <div class="menu-item" data-title="Server">Server <span>></span></div>
-      </div>
+    <div class="menu-section" id="mainMenu">
+      <div class="menu-item" data-title="Self">Self <span>></span></div>
+      <div class="menu-item" data-title="Server">Server <span>></span></div>
+      <div class="menu-item" data-title="Weapon">Weapon <span>></span></div>
+      <div class="menu-item" data-title="Combat">Combat <span>></span></div>
+    </div>
 
-      <div class="menu-section submenu" id="submenu"></div>
+    <div class="menu-section submenu" id="submenu">
+      <!-- Submenu wird von Lua gesetzt -->
+    </div>
 
-      <div class="menu-footer">
-        <div>Build: 262119</div>
-        <div id="pageCounter">1 / 2</div>
-      </div>
+    <div class="menu-footer">
+      <div>Build: 262119</div>
+      <div id="pageCounter">1 / 4</div>
     </div>
   </div>
+</div>
 
-  <script>
+<script>
 const dbg = document.getElementById('dbg');
 const items = [...document.querySelectorAll('.menu-item')];
-let submenuItems = [];
+let submenuItems = [...document.querySelectorAll('.submenu-item')];
 const submenu = document.getElementById('submenu');
 const mainMenu = document.getElementById('mainMenu');
 const menuTitle = document.getElementById('menuTitle');
 const pageCounter = document.getElementById('pageCounter');
 
 let index = 0, subIndex = 0;
-let noclipState = false, godmodeState = false;
 
-function updateSelection(){
-  items.forEach((el,i)=>el.classList.toggle('active', i===index));
-  pageCounter.textContent = `${index+1} / ${items.length}`;
-}
-
-function updateSubSelection(){
-  submenuItems.forEach((el,i)=>el.classList.toggle('active', i===subIndex));
-}
-
-function setSubmenuFor(title){
-  if(title === "Self"){
-    submenu.innerHTML = `
-      <div class="submenu-item">Noclip Options <span>${noclipState ? "ON" : "OFF"}</span></div>
-      <div class="submenu-item">Godmode Options <span>${godmodeState ? "ON" : "OFF"}</span></div>
-    `;
-    submenuItems = [...document.querySelectorAll('.submenu-item')];
-    subIndex = 0;
-    updateSubSelection();
-  }
-}
-
+function updateSelection(){ items.forEach((el,i)=>el.classList.toggle('active', i===index)); pageCounter.textContent = `${index+1} / ${items.length}`;}
+function updateSubSelection(){ submenuItems.forEach((el,i)=>el.classList.toggle('active', i===subIndex));}
 updateSelection();
 
 document.addEventListener('keydown', e=>{
   const inSub = getComputedStyle(submenu).display !== 'none';
-  if(!inSub){
-    if(e.key==='ArrowDown'){ index=(index+1)%items.length; updateSelection(); }
-    else if(e.key==='ArrowUp'){ index=(index-1+items.length)%items.length; updateSelection(); }
-    else if(e.key==='Enter'){
-      const title = items[index].dataset.title || items[index].textContent.trim().split(' ')[0];
-      menuTitle.textContent = title;
-      mainMenu.style.display='none'; submenu.style.display='flex';
-      setSubmenuFor(title);
+  if (!inSub){
+    if (e.key==='ArrowDown'){ index=(index+1)%items.length; updateSelection(); }
+    else if (e.key==='ArrowUp'){ index=(index-1+items.length)%items.length; updateSelection(); }
+    else if (e.key==='Enter'){
+      window.dispatchEvent(new MessageEvent('message',{data:{type:'requestSubmenu',title:items[index].dataset.title}}));
     }
-  }else{
-    if(e.key==='Backspace'){ submenu.style.display='none'; mainMenu.style.display='block'; menuTitle.textContent='Main menu'; updateSelection(); }
-    else if(e.key==='ArrowDown'){ subIndex=(subIndex+1)%submenuItems.length; updateSubSelection(); }
-    else if(e.key==='ArrowUp'){ subIndex=(subIndex-1+submenuItems.length)%submenuItems.length; updateSubSelection(); }
-    else if(e.key==='Enter'){
-      // Toggle states
+  } else {
+    if (e.key==='Backspace'){ submenu.style.display='none'; mainMenu.style.display='block'; menuTitle.textContent='Main menu'; updateSelection();}
+    else if (e.key==='ArrowDown'){ subIndex=(subIndex+1)%submenuItems.length; updateSubSelection(); }
+    else if (e.key==='ArrowUp'){ subIndex=(subIndex-1+submenuItems.length)%submenuItems.length; updateSubSelection(); }
+    else if (e.key==='Enter'){
       const activeItem = submenuItems[subIndex];
-      if(activeItem.textContent.includes("Noclip")){ noclipState = !noclipState; activeItem.querySelector('span').textContent = noclipState?"ON":"OFF"; window.dispatchEvent(new MessageEvent('message', {data:{type:'noclip_toggle',value:noclipState}})); }
-      if(activeItem.textContent.includes("Godmode")){ godmodeState = !godmodeState; activeItem.querySelector('span').textContent = godmodeState?"ON":"OFF"; window.dispatchEvent(new MessageEvent('message', {data:{type:'godmode_toggle',value:godmodeState}})); }
+      window.dispatchEvent(new MessageEvent('message',{data:{type:'toggleOption',option:activeItem.textContent.trim()}}));
     }
   }
 });
-  </script>
+
+window.addEventListener('message', ev=>{
+  const d = ev.data || {};
+  try{
+    switch(d.type){
+      case 'setSubmenu':
+        submenu.innerHTML = d.items.map((t,i)=>`<div class="submenu-item${i===0?' active':''}">${t}</div>`).join('');
+        submenuItems = [...document.querySelectorAll('.submenu-item')];
+        subIndex=0;
+        submenu.style.display='flex';
+        mainMenu.style.display='none';
+        menuTitle.textContent=d.title || 'Submenu';
+        updateSubSelection();
+        break;
+      case 'closeSubmenu':
+        submenu.style.display='none';
+        mainMenu.style.display='block';
+        menuTitle.textContent='Main menu';
+        updateSelection();
+        break;
+    }
+  }catch(e){ dbg.textContent='[UI ERROR] '+e.message; }
+});
+</script>
 </body>
 </html>

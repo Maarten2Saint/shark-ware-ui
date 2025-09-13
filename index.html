@@ -1,112 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shark.lua UI</title>
-<style>
-html, body { margin:0; padding:0; background:transparent; overflow:hidden; width:800px; height:600px;}
-.overlay { position:absolute; top:0; left:0; pointer-events:none; }
-.menu { width:360px; background:rgba(0,0,0,.18); color:#fff; display:flex; flex-direction:column; border:2px solid #666; }
-.menu-header img{ width:100%; display:block;}
-.menu-title{ background:rgba(0,0,0,.85); padding:8px 20px; font-weight:700; color:#d0d0d0;}
-.menu-section{ background:rgba(0,0,0,.35); flex-grow:1; }
-.menu-item{ padding:10px 20px; display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); cursor:default; color:#dcdcdc; }
-.menu-item.active{ background:#000; color:#fff;}
-.menu-item:hover:not(.active){ background:rgba(128,128,128,.2); }
-.submenu{ display:none; flex-direction:column; background:rgba(0,0,0,.45);}
-.submenu-item{ padding:8px 30px; border-bottom:1px solid rgba(255,255,255,.08); color:#bfbfbf;}
-.submenu-item.active{ background:rgba(128,128,128,.75); color:#fff;}
-.submenu-item:hover:not(.active){ background:rgba(128,128,128,.2); color:#fff;}
-.menu-footer{ background:rgba(0,0,0,.85); color:#b0b0b0; font-size:11px; padding:6px 10px; display:flex; justify-content:space-between;}
-#dbg{ position:fixed; left:8px; top:8px; font:12px monospace; color:#0f0; background:rgba(0,0,0,.35); padding:6px 8px; border:1px solid rgba(0,255,0,.25);}
-</style>
+  <meta charset="UTF-8">
+  <title>WebUi</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #111; /* fast schwarz */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+    }
+
+    .menu {
+      width: 360px;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #888;
+    }
+
+    .menu-header {
+      background: linear-gradient(135deg, #111, #555);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-header img {
+      height: 32px;
+      filter: grayscale(100%);
+    }
+
+    .menu-header span {
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .menu-title {
+      background: #000;
+      padding: 8px 20px;
+      font-weight: bold;
+      color: #ddd;
+    }
+
+    .menu-section {
+      background: rgba(0, 0, 0, 0.4);
+      flex-grow: 1;
+    }
+
+    .menu-item {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #222;
+      cursor: pointer;
+      background: transparent;
+      transition: background 0.2s;
+      color: #ddd;
+    }
+
+    .menu-item.active {
+      background: #888;
+      color: black;
+    }
+
+    .menu-item:hover:not(.active) {
+      background: rgba(200, 200, 200, 0.3);
+    }
+
+    .submenu {
+      display: none;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .submenu-item {
+      padding: 8px 30px;
+      border-bottom: 1px solid #222;
+      color: #aaa;
+    }
+
+    .submenu-item.active {
+      background: #888;
+      color: black;
+    }
+
+    .submenu-item:hover:not(.active) {
+      background: rgba(200, 200, 200, 0.3);
+      color: white;
+    }
+
+    .menu-search {
+      padding: 10px 20px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-search input {
+      flex: 1;
+      padding: 5px;
+      border: none;
+      background: #222;
+      color: white;
+    }
+
+    .menu-search svg {
+      fill: white;
+      width: 18px;
+      height: 18px;
+    }
+
+    .menu-footer {
+      background: #000;
+      color: #888;
+      font-size: 11px;
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
 </head>
 <body>
-<div id="dbg">[UI] booting…</div>
-
-<div class="overlay">
   <div class="menu">
-    <div class="menu-header">
-      <img src="https://cdn.discordapp.com/attachments/1366488328773439551/1403671888936435722/image.png" alt="Shark.Ware Banner">
+    <div class="menu-header" style="padding:0;">
+      <img src="https://i.imgur.com/yEGwgGe.png" 
+           alt="Shark.Ware Banner" 
+           style="width:100%; height:auto; display:block;">
     </div>
-
     <div class="menu-title" id="menuTitle">Main menu</div>
-
     <div class="menu-section" id="mainMenu">
-      <div class="menu-item" data-title="Self">Self <span>></span></div>
-      <div class="menu-item" data-title="Server">Server <span>></span></div>
-      <div class="menu-item" data-title="Weapon">Weapon <span>></span></div>
-      <div class="menu-item" data-title="Combat">Combat <span>></span></div>
+      <div class="menu-item">Self    <span>></span></div>
+      <div class="menu-item">Server  <span>></span></div>
+      <div class="menu-item">Weapon  <span>></span></div>
+      <div class="menu-item">Combat  <span>></span></div>
+      <div class="menu-item">Vehicle <span>></span></div>
+      <div class="menu-item">Visual  <span>></span></div>
+      <div class="menu-item">Misc    <span>></span></div>
+      <div class="menu-item">Settings<span>></span></div>
+      <div class="menu-item">Search  <span>></span></div>
     </div>
 
     <div class="menu-section submenu" id="submenu">
-      <!-- Submenu wird von Lua gesetzt -->
+      <div class="submenu-item">Placeholder 1 <span>></span></div>
+      <div class="submenu-item">Placeholder 2 <span>></span></div>
+      <div class="submenu-item">Placeholder 3 <span>></span></div>
+      <div class="submenu-item">Placeholder 4 <span>></span></div>
+      <div class="submenu-item">Placeholder 5 <span>></span></div>
     </div>
 
     <div class="menu-footer">
       <div>Build: 262119</div>
-      <div id="pageCounter">1 / 4</div>
+      <div id="pageCounter">1 / 9</div>
     </div>
   </div>
-</div>
 
-<script>
-const dbg = document.getElementById('dbg');
-const items = [...document.querySelectorAll('.menu-item')];
-let submenuItems = [...document.querySelectorAll('.submenu-item')];
-const submenu = document.getElementById('submenu');
-const mainMenu = document.getElementById('mainMenu');
-const menuTitle = document.getElementById('menuTitle');
-const pageCounter = document.getElementById('pageCounter');
+  <script>
+    const items = document.querySelectorAll('.menu-item');
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    const submenu = document.getElementById('submenu');
+    const mainMenu = document.getElementById('mainMenu');
+    const menuTitle = document.getElementById('menuTitle');
+    const pageCounter = document.getElementById('pageCounter');
+    let index = 0;
+    let subIndex = 0;
 
-let index = 0, subIndex = 0;
-
-function updateSelection(){ items.forEach((el,i)=>el.classList.toggle('active', i===index)); pageCounter.textContent = `${index+1} / ${items.length}`;}
-function updateSubSelection(){ submenuItems.forEach((el,i)=>el.classList.toggle('active', i===subIndex));}
-updateSelection();
-
-document.addEventListener('keydown', e=>{
-  const inSub = getComputedStyle(submenu).display !== 'none';
-  if (!inSub){
-    if (e.key==='ArrowDown'){ index=(index+1)%items.length; updateSelection(); }
-    else if (e.key==='ArrowUp'){ index=(index-1+items.length)%items.length; updateSelection(); }
-    else if (e.key==='Enter'){
-      window.dispatchEvent(new MessageEvent('message',{data:{type:'requestSubmenu',title:items[index].dataset.title}}));
+    function updateSelection() {
+      items.forEach((item, i) => {
+        item.classList.remove('active');
+        if (i === index) item.classList.add('active');
+      });
+      pageCounter.innerText = `${index + 1} / ${items.length}`;
     }
-  } else {
-    if (e.key==='Backspace'){ submenu.style.display='none'; mainMenu.style.display='block'; menuTitle.textContent='Main menu'; updateSelection();}
-    else if (e.key==='ArrowDown'){ subIndex=(subIndex+1)%submenuItems.length; updateSubSelection(); }
-    else if (e.key==='ArrowUp'){ subIndex=(subIndex-1+submenuItems.length)%submenuItems.length; updateSubSelection(); }
-    else if (e.key==='Enter'){
-      const activeItem = submenuItems[subIndex];
-      window.dispatchEvent(new MessageEvent('message',{data:{type:'toggleOption',option:activeItem.textContent.trim()}}));
-    }
-  }
-});
 
-window.addEventListener('message', ev=>{
-  const d = ev.data || {};
-  try{
-    switch(d.type){
-      case 'setSubmenu':
-        submenu.innerHTML = d.items.map((t,i)=>`<div class="submenu-item${i===0?' active':''}">${t}</div>`).join('');
-        submenuItems = [...document.querySelectorAll('.submenu-item')];
-        subIndex=0;
-        submenu.style.display='flex';
-        mainMenu.style.display='none';
-        menuTitle.textContent=d.title || 'Submenu';
-        updateSubSelection();
-        break;
-      case 'closeSubmenu':
-        submenu.style.display='none';
-        mainMenu.style.display='block';
-        menuTitle.textContent='Main menu';
-        updateSelection();
-        break;
+    function updateSubSelection() {
+      submenuItems.forEach((item, i) => {
+        item.classList.remove('active');
+        if (i === subIndex) item.classList.add('active');
+      });
     }
-  }catch(e){ dbg.textContent='[UI ERROR] '+e.message; }
-});
-</script>
+
+    updateSelection();
+
+    document.addEventListener('keydown', (e) => {
+      if (submenu.style.display === 'none') {
+        if (e.key === 'ArrowDown') {
+          index = (index + 1) % items.length;
+          updateSelection();
+        } else if (e.key === 'ArrowUp') {
+          index = (index - 1 + items.length) % items.length;
+          updateSelection();
+        } else if (e.key === 'Enter') {
+          const selectedText = items[index].innerText.split(' ')[0];
+          menuTitle.innerText = selectedText;
+          mainMenu.style.display = 'none';
+          submenu.style.display = 'flex';
+          subIndex = 0;
+          updateSubSelection();
+        }
+      } else {
+        if (e.key === 'Backspace') {
+          submenu.style.display = 'none';
+          mainMenu.style.display = 'block';
+          menuTitle.innerText = 'Main menu';
+          updateSelection();
+        } else if (e.key === 'ArrowDown') {
+          subIndex = (subIndex + 1) % submenuItems.length;
+          updateSubSelection();
+        } else if (e.key === 'ArrowUp') {
+          subIndex = (subIndex - 1 + submenuItems.length) % submenuItems.length;
+          updateSubSelection();
+        }
+      }
+    });
+  </script>
 </body>
 </html>

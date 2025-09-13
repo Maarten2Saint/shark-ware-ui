@@ -2,226 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WebUi</title>
+  <title>Shark Ware UI</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
-      background: #111; /* fast schwarz */
+      padding: 0;
+      background: transparent !important;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       font-family: 'Segoe UI', sans-serif;
-      color: white;
+      overflow: hidden;
     }
 
-    .menu {
-      width: 360px;
-      background: rgba(0, 0, 0, 0.2);
+    .menu-container {
+      width: 400px;
+      background: rgba(10, 10, 10, 0.85);
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      box-shadow: 0 0 20px rgba(52, 152, 219, 0.4);
       color: white;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-      display: flex;
-      flex-direction: column;
-      border: 2px solid #888;
+      overflow: hidden;
     }
 
     .menu-header {
-      background: linear-gradient(135deg, #111, #555);
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: linear-gradient(135deg, #1a1a1a, #2c3e50);
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #3498db;
     }
 
-    .menu-header img {
-      height: 32px;
-      filter: grayscale(100%);
+    .menu-header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #3498db;
+      text-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
     }
 
-    .menu-header span {
-      font-size: 22px;
-      font-weight: bold;
-      color: white;
+    .menu-header p {
+      margin: 5px 0 0 0;
+      font-size: 12px;
+      color: #95a5a6;
     }
 
     .menu-title {
-      background: #000;
-      padding: 8px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 15px;
       font-weight: bold;
-      color: #ddd;
+      color: #3498db;
+      border-bottom: 1px solid #2c3e50;
     }
 
-    .menu-section {
-      background: rgba(0, 0, 0, 0.4);
-      flex-grow: 1;
+    .menu-items {
+      max-height: 300px;
+      overflow-y: auto;
     }
 
     .menu-item {
-      padding: 10px 20px;
+      padding: 12px 15px;
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid #222;
-      cursor: pointer;
-      background: transparent;
+      align-items: center;
+      border-bottom: 1px solid rgba(52, 152, 219, 0.2);
       transition: background 0.2s;
-      color: #ddd;
+      color: #ecf0f1;
+    }
+
+    .menu-item:hover {
+      background: rgba(52, 152, 219, 0.1);
     }
 
     .menu-item.active {
-      background: #888;
-      color: black;
+      background: rgba(52, 152, 219, 0.3);
+      color: #ffffff;
     }
 
-    .menu-item:hover:not(.active) {
-      background: rgba(200, 200, 200, 0.3);
-    }
-
-    .submenu {
-      display: none;
-      flex-direction: column;
-      background: rgba(0, 0, 0, 0.5);
-    }
-
-    .submenu-item {
-      padding: 8px 30px;
-      border-bottom: 1px solid #222;
-      color: #aaa;
-    }
-
-    .submenu-item.active {
-      background: #888;
-      color: black;
-    }
-
-    .submenu-item:hover:not(.active) {
-      background: rgba(200, 200, 200, 0.3);
-      color: white;
-    }
-
-    .menu-search {
-      padding: 10px 20px;
-      background: #111;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .menu-search input {
-      flex: 1;
-      padding: 5px;
-      border: none;
-      background: #222;
-      color: white;
-    }
-
-    .menu-search svg {
-      fill: white;
-      width: 18px;
-      height: 18px;
+    .menu-item .arrow {
+      color: #3498db;
+      font-weight: bold;
     }
 
     .menu-footer {
-      background: #000;
-      color: #888;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 15px;
       font-size: 11px;
-      padding: 6px 10px;
+      color: #7f8c8d;
       display: flex;
       justify-content: space-between;
+      border-top: 1px solid #2c3e50;
+    }
+
+    /* Scrollbar Styling */
+    .menu-items::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .menu-items::-webkit-scrollbar-track {
+      background: rgba(52, 152, 219, 0.1);
+    }
+
+    .menu-items::-webkit-scrollbar-thumb {
+      background: #3498db;
+      border-radius: 2px;
+    }
+
+    /* Animation for selection */
+    @keyframes pulse {
+      0% { background: rgba(52, 152, 219, 0.3); }
+      50% { background: rgba(52, 152, 219, 0.5); }
+      100% { background: rgba(52, 152, 219, 0.3); }
+    }
+
+    .menu-item.active {
+      animation: pulse 2s infinite;
     }
   </style>
 </head>
 <body>
-  <div class="menu">
-    <div class="menu-header" style="padding:0;">
-      <img src="https://i.imgur.com/yEGwgGe.png" 
-           alt="Shark.Ware Banner" 
-           style="width:100%; height:auto; display:block;">
+  <div class="menu-container">
+    <div class="menu-header">
+      <h1>SHARK WARE</h1>
+      <p>Premium FiveM Menu</p>
     </div>
-    <div class="menu-title" id="menuTitle">Main menu</div>
-    <div class="menu-section" id="mainMenu">
-      <div class="menu-item">Self    <span>></span></div>
-      <div class="menu-item">Server  <span>></span></div>
-      <div class="menu-item">Weapon  <span>></span></div>
-      <div class="menu-item">Combat  <span>></span></div>
-      <div class="menu-item">Vehicle <span>></span></div>
-      <div class="menu-item">Visual  <span>></span></div>
-      <div class="menu-item">Misc    <span>></span></div>
-      <div class="menu-item">Settings<span>></span></div>
-      <div class="menu-item">Search  <span>></span></div>
+    <div class="menu-title" id="menuTitle">MAIN MENU</div>
+    <div class="menu-items" id="menuItems">
+      <!-- Menu items will be populated by JavaScript -->
     </div>
-
-    <div class="menu-section submenu" id="submenu">
-      <div class="submenu-item">Placeholder 1 <span>></span></div>
-      <div class="submenu-item">Placeholder 2 <span>></span></div>
-      <div class="submenu-item">Placeholder 3 <span>></span></div>
-      <div class="submenu-item">Placeholder 4 <span>></span></div>
-      <div class="submenu-item">Placeholder 5 <span>></span></div>
-    </div>
-
     <div class="menu-footer">
       <div>Build: 262119</div>
-      <div id="pageCounter">1 / 9</div>
+      <div id="pageCounter">1/1</div>
     </div>
   </div>
 
   <script>
-    const items = document.querySelectorAll('.menu-item');
-    const submenuItems = document.querySelectorAll('.submenu-item');
-    const submenu = document.getElementById('submenu');
-    const mainMenu = document.getElementById('mainMenu');
-    const menuTitle = document.getElementById('menuTitle');
-    const pageCounter = document.getElementById('pageCounter');
-    let index = 0;
-    let subIndex = 0;
+    let currentMenu = "Main";
+    let currentOption = 0;
+    let menuData = {};
 
-    function updateSelection() {
-      items.forEach((item, i) => {
-        item.classList.remove('active');
-        if (i === index) item.classList.add('active');
+    // Function to update the menu display
+    function updateMenuDisplay() {
+      const menuItemsContainer = document.getElementById('menuItems');
+      const menuTitle = document.getElementById('menuTitle');
+      const pageCounter = document.getElementById('pageCounter');
+      
+      // Clear current items
+      menuItemsContainer.innerHTML = '';
+      
+      // Set menu title
+      menuTitle.textContent = currentMenu.toUpperCase();
+      
+      // Get current menu items
+      const items = menuData[currentMenu] || [];
+      
+      // Create menu items
+      items.forEach((item, index) => {
+        const menuItem = document.createElement('div');
+        menuItem.className = 'menu-item';
+        if (index === currentOption) {
+          menuItem.classList.add('active');
+        }
+        
+        // Check if this item has a submenu
+        const hasSubmenu = menuData[item] !== undefined;
+        
+        menuItem.innerHTML = `
+          <span>${item}</span>
+          ${hasSubmenu ? '<span class="arrow">></span>' : ''}
+        `;
+        
+        menuItemsContainer.appendChild(menuItem);
       });
-      pageCounter.innerText = `${index + 1} / ${items.length}`;
+      
+      // Update page counter
+      pageCounter.textContent = `${currentOption + 1}/${items.length}`;
     }
 
-    function updateSubSelection() {
-      submenuItems.forEach((item, i) => {
-        item.classList.remove('active');
-        if (i === subIndex) item.classList.add('active');
-      });
-    }
-
-    updateSelection();
-
-    document.addEventListener('keydown', (e) => {
-      if (submenu.style.display === 'none') {
-        if (e.key === 'ArrowDown') {
-          index = (index + 1) % items.length;
-          updateSelection();
-        } else if (e.key === 'ArrowUp') {
-          index = (index - 1 + items.length) % items.length;
-          updateSelection();
-        } else if (e.key === 'Enter') {
-          const selectedText = items[index].innerText.split(' ')[0];
-          menuTitle.innerText = selectedText;
-          mainMenu.style.display = 'none';
-          submenu.style.display = 'flex';
-          subIndex = 0;
-          updateSubSelection();
-        }
-      } else {
-        if (e.key === 'Backspace') {
-          submenu.style.display = 'none';
-          mainMenu.style.display = 'block';
-          menuTitle.innerText = 'Main menu';
-          updateSelection();
-        } else if (e.key === 'ArrowDown') {
-          subIndex = (subIndex + 1) % submenuItems.length;
-          updateSubSelection();
-        } else if (e.key === 'ArrowUp') {
-          subIndex = (subIndex - 1 + submenuItems.length) % submenuItems.length;
-          updateSubSelection();
-        }
+    // Listen for messages from FiveM
+    window.addEventListener('message', function(event) {
+      const data = event.data;
+      
+      if (data.type === 'menuUpdate') {
+        menuData = data.data.menuStructure;
+        currentMenu = data.data.currentMenu;
+        currentOption = data.data.currentOption;
+        updateMenuDisplay();
       }
     });
+
+    // Initial empty display
+    updateMenuDisplay();
   </script>
 </body>
 </html>

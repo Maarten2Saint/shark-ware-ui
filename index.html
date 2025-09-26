@@ -2,147 +2,303 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Shark Menu</title>
+<title>Shark Ware UI</title>
 <style>
-html, body {
-  margin:0;padding:0;
-  background:transparent;
-  overflow:hidden;
-  width:800px;height:600px;
-  font-family:Arial,sans-serif;
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
 }
-.menu {
-  width:360px;
-  background:rgba(0,0,0,.2);
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  border:2px solid #666;
-  border-radius:10px;
-  overflow:hidden;
+.menu-container {
+  width: 400px;
+  background: rgba(10, 10, 10, 0.85);
+  border: 2px solid #3498db;
+  border-radius: 5px;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.4);
+  color: white;
+  overflow: hidden;
 }
-.menu-header {background:rgba(0,0,0,.85);padding:8px 20px;font-weight:700;}
-.menu-section {background:rgba(0,0,0,.35);flex-grow:1;overflow-y:auto;}
-.menu-item,.submenu-item {
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,.08);
+.menu-header {
+  background: linear-gradient(135deg, #1a1a1a, #2c3e50);
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #3498db;
 }
-.active {background:rgba(128,128,128,.35);color:#fff;}
-.switch {position:relative;display:inline-block;width:34px;height:18px;}
-.switch input {display:none;}
+.menu-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #3498db;
+  text-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+}
+.menu-header p {
+  margin: 5px 0 0 0;
+  font-size: 12px;
+  color: #95a5a6;
+}
+.menu-title {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 15px;
+  font-weight: bold;
+  color: #3498db;
+  border-bottom: 1px solid #2c3e50;
+}
+.menu-items {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.menu-items::-webkit-scrollbar {
+  width: 5px;
+}
+.menu-items::-webkit-scrollbar-track {
+  background: rgba(52, 152, 219, 0.1);
+}
+.menu-items::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 2px;
+}
+.menu-item, .submenu-item {
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+  transition: background 0.2s;
+  color: #ecf0f1;
+}
+.menu-item:hover, .submenu-item:hover {
+  background: rgba(52, 152, 219, 0.1);
+}
+.menu-item.active, .submenu-item.active {
+  background: rgba(52, 152, 219, 0.3);
+  color: #ffffff;
+  animation: pulse 2s infinite;
+}
+.menu-item .arrow, .submenu-item .arrow {
+  color: #3498db;
+  font-weight: bold;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+.switch input {
+  display: none;
+}
 .slider {
-  position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
-  background:#555;transition:.2s;border-radius:34px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #444;
+  transition: 0.2s;
+  border-radius: 20px;
 }
 .slider:before {
-  position:absolute;content:"";height:14px;width:14px;left:2px;bottom:2px;
-  background:white;transition:.2s;border-radius:50%;
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  transition: 0.2s;
+  border-radius: 50%;
 }
-input:checked+.slider {background:#4ade80;}
-input:checked+.slider:before {transform:translateX(16px);}
-.dot {width:10px;height:10px;background:#aaa;border-radius:50%;display:inline-block;}
-.value {display:flex;align-items:center;}
-.value span:last-child {font-size:0.9em;color:#ccc;}
+input:checked + .slider {
+  background: #3498db;
+}
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #3498db;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+}
+.value {
+  display: flex;
+  align-items: center;
+}
+.value span:last-child {
+  font-size: 0.9em;
+  color: #3498db;
+  opacity: 0.8;
+}
+.menu-footer {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 15px;
+  font-size: 11px;
+  color: #7f8c8d;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #2c3e50;
+}
+.notify-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+}
+.notify {
+  background: rgba(10, 10, 10, 0.9);
+  border-left: 4px solid #3498db;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  color: #ecf0f1;
+  font-size: 14px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+  opacity: 0;
+  animation: fadeInOut 3s ease forwards;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes pulse {
+  0% { background: rgba(52, 152, 219, 0.3); }
+  50% { background: rgba(52, 152, 219, 0.5); }
+  100% { background: rgba(52, 152, 219, 0.3); }
+}
 </style>
 </head>
 <body>
-<div class="menu">
-  <div class="menu-header" id="menuTitle">Main menu</div>
-  <div class="menu-section" id="mainMenu"></div>
-  <div class="menu-section" id="submenu" style="display:none;"></div>
+<div class="menu-container">
+  <div class="menu-header">
+    <h1>SHARK WARE</h1>
+    <p>Premium FiveM Menu</p>
+  </div>
+  <div class="menu-title" id="menuTitle">Main menu</div>
+  <div class="menu-items" id="mainMenu"></div>
+  <div class="menu-items" id="submenu" style="display:none;"></div>
+  <div class="menu-footer">
+    <div>Build: 262119</div>
+    <div id="pageCounter">1/1</div>
+  </div>
 </div>
+<div class="notify-container" id="notifyContainer"></div>
 
 <script>
-let mainMenu=document.getElementById("mainMenu");
-let submenu=document.getElementById("submenu");
-let menuTitle=document.getElementById("menuTitle");
-let items=[],submenuItems=[];
-let index=0,subIndex=0;
+let mainMenu = document.getElementById("mainMenu");
+let submenu = document.getElementById("submenu");
+let menuTitle = document.getElementById("menuTitle");
+let pageCounter = document.getElementById("pageCounter");
+let notifyContainer = document.getElementById("notifyContainer");
+let items = [], submenuItems = [];
+let index = 0, subIndex = 0;
 
-function updateSelection(){
-  [...mainMenu.children].forEach((el,i)=>el.classList.toggle("active",i===index));
+function updateSelection() {
+  [...mainMenu.children].forEach((el, i) => el.classList.toggle("active", i === index));
+  pageCounter.textContent = `${index + 1}/${items.length}`;
 }
-function updateSubSelection(){
-  [...submenu.children].forEach((el,i)=>el.classList.toggle("active",i===subIndex));
+function updateSubSelection() {
+  [...submenu.children].forEach((el, i) => el.classList.toggle("active", i === subIndex));
+  pageCounter.textContent = `${subIndex + 1}/${submenuItems.length}`;
 }
-function updateToggleUI(el,state){
-  const input=el.querySelector("input[type=checkbox]");
-  if(input) input.checked=state;
+function updateToggleUI(el, state) {
+  const input = el.querySelector("input[type=checkbox]");
+  if (input) input.checked = state;
 }
-function updateValueUI(el,state,range){
-  const valueSpan=el.querySelector(".value span:last-child");
-  if(valueSpan){
-    let displayState=typeof state==="object"?`X:${state.x},Y:${state.y}`:state;
-    valueSpan.textContent=`${displayState} [${range}]`;
+function updateValueUI(el, state, range) {
+  const valueSpan = el.querySelector(".value span:last-child");
+  if (valueSpan) {
+    let displayState = typeof state === "object" ? `X:${state.x},Y:${state.y}` : state;
+    valueSpan.textContent = `${displayState} [${range}]`;
   }
 }
+function showNotify(message) {
+  const notify = document.createElement("div");
+  notify.className = "notify";
+  notify.textContent = message;
+  notifyContainer.appendChild(notify);
+  setTimeout(() => notify.remove(), 3000);
+}
 
-window.addEventListener("message",(ev)=>{
-  const d=ev.data; if(!d||!d.type) return;
-  switch(d.type){
+window.addEventListener("message", (ev) => {
+  const d = ev.data; if (!d || !d.type) return;
+  switch (d.type) {
     case "setTitle":
-      menuTitle.textContent=d.text||"Main menu"; break;
+      menuTitle.textContent = d.text || "Main menu"; break;
     case "setItems": {
-      items=d.items||[];
-      mainMenu.innerHTML=items.map((f,i)=>`<div class="menu-item${i===index?" active":""}" data-feature="${f}"><span>${f}</span><span>></span></div>`).join("");
+      items = d.items || [];
+      mainMenu.innerHTML = items.map((f, i) => `<div class="menu-item${i === index ? " active" : ""}" data-feature="${f}"><span>${f}</span><span class="arrow">></span></div>`).join("");
+      updateSelection();
       break;
     }
-    case "selectIndex": index=d.index||0; updateSelection(); break;
+    case "selectIndex": index = d.index || 0; updateSelection(); break;
     case "setSubmenu": {
-      submenuItems=d.items||[];
-      const states=d.states||{};
-      submenu.innerHTML=submenuItems.map((f,i)=>{
-        const stateData=states[f]||{type:"button"};
-        if(stateData.type==="toggle"){
-          const state=!!stateData.state;
-          return `<div class="submenu-item${i===0?" active":""}" data-feature="${f}" data-type="toggle">
+      submenuItems = d.items || [];
+      const states = d.states || {};
+      submenu.innerHTML = submenuItems.map((f, i) => {
+        const stateData = states[f] || { type: "button" };
+        if (stateData.type === "toggle") {
+          const state = !!stateData.state;
+          return `<div class="submenu-item${i === 0 ? " active" : ""}" data-feature="${f}" data-type="toggle">
                    <span>${f}</span>
                    <label class="switch">
-                     <input type="checkbox" ${state?"checked":""}>
+                     <input type="checkbox" ${state ? "checked" : ""}>
                      <span class="slider"></span>
                    </label>
                  </div>`;
-        } else if(stateData.type==="value"){
-          let range=stateData.values?stateData.values.join("/"):stateData.min!==undefined?`${stateData.min}-${stateData.max}`:"";
-          let displayState=typeof stateData.state==="object"?`X:${stateData.state.x},Y:${stateData.state.y}`:stateData.state;
-          return `<div class="submenu-item${i===0?" active":""}" data-feature="${f}" data-type="value">
+        } else if (stateData.type === "value") {
+          let range = stateData.values ? stateData.values.join("/") : stateData.min !== undefined ? `${stateData.min}-${stateData.max}` : "";
+          let displayState = typeof stateData.state === "object" ? `X:${stateData.state.x},Y:${stateData.state.y}` : stateData.state;
+          return `<div class="submenu-item${i === 0 ? " active" : ""}" data-feature="${f}" data-type="value">
                    <span>${f}</span>
                    <span class="value"><span>${displayState} [${range}]</span></span>
                  </div>`;
         } else {
-          return `<div class="submenu-item${i===0?" active":""}" data-feature="${f}" data-type="button">
+          return `<div class="submenu-item${i === 0 ? " active" : ""}" data-feature="${f}" data-type="button">
                    <span>${f}</span><span class="dot"></span>
                  </div>`;
         }
       }).join("");
+      updateSubSelection();
       break;
     }
     case "openSubmenu":
-      mainMenu.style.display="none";
-      submenu.style.display="block";
-      subIndex=0; updateSubSelection();
+      mainMenu.style.display = "none";
+      submenu.style.display = "block";
+      subIndex = 0; updateSubSelection();
       break;
     case "closeSubmenu":
-      submenu.style.display="none";
-      mainMenu.style.display="block";
+      submenu.style.display = "none";
+      mainMenu.style.display = "block";
+      updateSelection();
       break;
-    case "selectSub": subIndex=d.index||0; updateSubSelection(); break;
+    case "selectSub": subIndex = d.index || 0; updateSubSelection(); break;
     case "featureState": {
-      const name=d.name,state=d.state,type=d.type;
-      [...submenu.children].forEach(el=>{
-        if(el.dataset.feature===name){
-          if(type==="toggle"){
-            updateToggleUI(el,state);
-          } else if(type==="value"){
-            let range=d.values?d.values.join("/"):d.min!==undefined?`${d.min}-${d.max}`:"";
-            updateValueUI(el,state,range);
+      const name = d.name, state = d.state, type = d.type;
+      [...submenu.children].forEach(el => {
+        if (el.dataset.feature === name) {
+          if (type === "toggle") {
+            updateToggleUI(el, state);
+          } else if (type === "value") {
+            let range = d.values ? d.values.join("/") : d.min !== undefined ? `${d.min}-${d.max}` : "";
+            updateValueUI(el, state, range);
           }
         }
       });
       break;
     }
+    case "notify":
+      showNotify(d.message || "Action performed");
+      break;
   }
 });
 </script>
